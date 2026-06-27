@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Board (Prototype)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>📋 Task Board</h1>
+    <button id="trashToggleBtn" class="trash-toggle-btn" title="削除済みカード一覧">
+      🗑 <span id="trashCount" class="trash-count">0</span>
+    </button>
+  </header>
+
+  <main class="board-container">
+    <ul id="lists" class="lists"></ul>
+
+    <form id="addListForm" class="add-list-form" autocomplete="off">
+      <input id="addListInput" type="text" placeholder="＋ リストを追加" maxlength="50">
+      <div class="field-error" id="addListError"></div>
+    </form>
+  </main>
+
+  <!-- 削除済みカード（ゴミ箱）パネル -->
+  <aside id="trashPanel" class="trash-panel hidden">
+    <div class="trash-panel-header">
+      <h2>削除済みカード</h2>
+      <button id="trashPanelClose" class="modal-close" aria-label="閉じる">×</button>
+    </div>
+    <p class="trash-hint">ドラッグしてボードに戻せます。削除から1週間で自動的に消えます。</p>
+    <ul id="trashList" class="trash-list"></ul>
+  </aside>
+
+  <!-- カード編集モーダル -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button id="modalClose" class="modal-close" aria-label="閉じる">×</button>
+
+      <label class="modal-label" for="modalText">タスク名</label>
+      <textarea id="modalText" maxlength="200" rows="2"></textarea>
+      <div class="field-error" id="modalTextError"></div>
+
+      <label class="modal-label" for="modalDate">期限日</label>
+      <input id="modalDate" type="date">
+
+      <label class="modal-label" for="modalPriority">優先度</label>
+      <select id="modalPriority">
+        <option value="">未設定</option>
+        <option value="high">高</option>
+        <option value="medium">中</option>
+        <option value="low">低</option>
+      </select>
+
+      <div class="modal-comments-section">
+        <label class="modal-label">コメント</label>
+        <ul id="modalCommentList" class="comment-list"></ul>
+
+        <form id="addCommentForm" class="add-comment-form" autocomplete="off">
+          <input id="addCommentInput" type="text" placeholder="コメントを追加...">
+          <button type="submit">追加</button>
+        </form>
+        <div class="field-error" id="modalCommentError"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modalDeleteCard" class="danger-btn">このカードを削除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- カードホバー時のコメント表示用ツールチップ -->
+  <div id="cardCommentTooltip" class="card-comment-tooltip hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
