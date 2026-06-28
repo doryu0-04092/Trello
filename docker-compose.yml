@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: trello-postgres
+    environment:
+      POSTGRES_DB: trello
+      POSTGRES_USER: trello
+      POSTGRES_PASSWORD: trello
+    ports:
+      - "5432:5432"
+    volumes:
+      - trello-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trello -d trello"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  trello-postgres-data:

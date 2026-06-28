@@ -6,21 +6,40 @@
 ## 構成
 
 - Java 21 + Spring Boot 3.3（Maven）
-- データベース: H2インメモリDB（再起動するとデータは消えます。永続化が必要になったらPostgreSQLに切り替え予定）
+- データベース: PostgreSQL（Docker Composeで起動。データはコンテナ再起動後も永続化される）
 - 起動時に初期データとして「作業中」「完了」の2リストを自動作成（要件4.1）
 
 ## 起動方法
+
+1. PostgreSQLコンテナを起動（リポジトリルートで実行）
+
+```bash
+docker compose up -d
+```
+
+2. バックエンドを起動
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
+接続情報は環境変数で上書き可能（デフォルトは `docker-compose.yml` の設定と一致）。
+
+| 環境変数 | デフォルト |
+|---|---|
+| DB_HOST | localhost |
+| DB_PORT | 5432 |
+| DB_NAME | trello |
+| DB_USER | trello |
+| DB_PASSWORD | trello |
+
 起動後、ブラウザで以下を開く。
 
 - http://localhost:8080/ — 動作確認用の簡易ページ。リスト・カードの追加/削除がその場でAPI経由で行われ、動いている様子を確認できる
 - http://localhost:8080/api/lists — REST APIの生のJSONレスポンス
-- http://localhost:8080/h2-console — H2のDB内容を直接確認（JDBC URL: `jdbc:h2:mem:trello`、ユーザー: `sa`、パスワードなし）
+
+DBの内容を直接確認したい場合は `docker exec -it trello-postgres psql -U trello -d trello` でpsqlに接続する。
 
 ## API一覧（最小実装）
 
@@ -42,5 +61,5 @@ mvn spring-boot:run
 - ドラッグ＆ドロップの並び替え保存（`displayOrder`項目自体は用意済み）
 - ソフトデリート・ゴミ箱（7日間保持・復元）
 - カードの自動並び替え（期限日順／優先度順）
-- PostgreSQL・Flyway・Docker Compose構成への切り替え
+- Flywayによるマイグレーション管理
 - フロントエンド（React）からの接続・CORS設定
