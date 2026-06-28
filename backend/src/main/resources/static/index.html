@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>バックエンド動作確認ページ</title>
+<style>
+  body { font-family: sans-serif; background: #222; color: #eee; padding: 20px; }
+  h1 { font-size: 18px; }
+  .lists { display: flex; gap: 16px; flex-wrap: wrap; }
+  .list { background: #333; border-radius: 6px; padding: 10px; width: 240px; }
+  .list h2 { font-size: 14px; margin: 0 0 8px; }
+  .card { background: #444; border-radius: 4px; padding: 6px; margin-bottom: 6px; font-size: 13px; }
+  .card .meta { color: #aaa; font-size: 11px; }
+  .card button, .list button, form button { cursor: pointer; }
+  input { width: 100%; box-sizing: border-box; margin-top: 4px; }
+  form { margin-top: 8px; display: flex; gap: 4px; }
+  form input { margin: 0; }
+  #log { margin-top: 20px; background: #000; color: #0f0; padding: 10px; font-size: 12px; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+  .add-list { margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<h1>バックエンド動作確認ページ（フロントエンド未実装・APIの簡易確認用）</h1>
+
+<div class="add-list">
+  <form id="add-list-form">
+    <input id="new-list-title" placeholder="新しいリスト名" maxlength="50">
+    <button type="submit">リスト追加</button>
+  </form>
+</div>
+
+<div id="lists" class="lists"></div>
+
+<div id="log"></div>
+
+<script>
+const log = (msg) => {
+  const el = document.getElementById('log');
+  el.textContent = `[${new Date().toLocaleTimeString()}] ${msg}\n` + el.textContent;
+};
+
+async function api(path, options) {
+  const res = await fetch(path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  if (!res.ok) {
+    log(`ERROR ${options?.method ?? 'GET'} ${path} -> ${res.status}`);
+    throw new Error(`${res.status}`);
+  }
+  log(`OK ${options?.method ?? 'GET'} ${path} -> ${res.status}`);
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+async function loadLists() {
+  const lists = await api('/api/lists');
+  const container = document.getElementById('lists');
+  container.innerHTML = '';
+  for (const list of lists) {
+    container.appendChild(renderList(list));
+  }
+}
+
+function renderList(list) {
+  const div = document.createElement('div');
+  div.className = 'list';
+
+  const h2 = document.createElement('h2');
+  h2.textContent = `${list.title} (id:${list.id})`;
+  div.appendChild(h2);
+
+  const delListBtn = document.createElement('button');
+  delListBtn.textContent = 'リスト削除';
+  delListBtn.onclick = async () => {
+    await api(`/api/lists/${list.id}`, { method: 'DELETE' });
+    loadLists();
+  };
+  div.appendChild(delListBtn);
+
+  for (const card of list.cards) {
+    div.appendChild(renderCard(card));
+  }
+
+  const form = document.createElement('form');
+  const input = document.createElement('input');
+  input.placeholder = 'カードを追加';
+  input.maxLength = 200;
+  const btn = document.createElement('button');
+  btn.textContent = '追加';
+  form.appendChild(input);
+  form.appendChild(btn);
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    if (!input.value.trim()) return;
+    await api(`/api/lists/${list.id}/cards`, {
+      method: 'POST',
+      body: JSON.stringify({ text: input.value }),
+    });
+    loadLists();
+  };
+  div.appendChild(form);
+
+  return div;
+}
+
+function renderCard(card) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <div>${card.text}</div>
+    <div class="meta">
+      期限: ${card.dueDate ?? '未設定'} / 優先度: ${card.priority ?? '未設定'} / コメント: ${card.comments.length}件
+    </div>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.textContent = '削除';
+  delBtn.onclick = async () => {
+    await api(`/api/cards/${card.id}`, { method: 'DELETE' });
+    loadLists();
+  };
+  div.appendChild(delBtn);
+  return div;
+}
+
+document.getElementById('add-list-form').onsubmit = async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('new-list-title');
+  if (!input.value.trim()) return;
+  await api('/api/lists', { method: 'POST', body: JSON.stringify({ title: input.value }) });
+  input.value = '';
+  loadLists();
+};
+
+loadLists();
+</script>
+</body>
+</html>
