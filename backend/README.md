@@ -56,6 +56,16 @@ DBの内容を直接確認したい場合は `docker exec -it trello-postgres ps
 | GET | /api/cards/{cardId}/comments | コメント一覧 |
 | POST | /api/cards/{cardId}/comments | コメント追加 `{ "text": "..." }` |
 
+## テスト実行
+
+READ系API（`GET /api/lists`, `GET /api/lists/{listId}/cards`, `GET /api/cards/{cardId}/comments`）に対する統合テストを用意している。H2ではなく、起動中のdocker-compose PostgreSQLに対して実際にテストデータをINSERTしてからGETを叩き、レスポンス内容を検証する（テストデータは`@Transactional`により終了後に自動ロールバックされる）。
+
+```bash
+docker compose up -d   # リポジトリルートでPostgreSQLを起動済みにしておく
+cd backend
+mvn test
+```
+
 ## 今回スコープ外（雛形のため未実装）
 
 - ドラッグ＆ドロップの並び替え保存（`displayOrder`項目自体は用意済み）
