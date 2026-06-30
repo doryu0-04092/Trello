@@ -1,3 +1,4 @@
 .claude/
 backend/target/
 backend/run.log
+.vscode/
