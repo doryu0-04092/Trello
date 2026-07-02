@@ -34,6 +34,14 @@ mvn spring-boot:run
 | DB_USER | trello |
 | DB_PASSWORD | trello |
 
+### ポート
+
+バックエンドのポートは `SERVER_PORT` 環境変数で上書き可能（デフォルトは `8080`）。指定ポートが使用中の場合、Spring Bootは別のポートへ自動フォールバックせず起動エラーで終了する。フロントエンド（`frontend/vite.config.ts`）は開発時 `http://localhost:8080` へAPIをプロキシする前提のため、`SERVER_PORT`を変更した場合はフロントエンド側の設定も合わせて変更すること。
+
+| 環境変数 | デフォルト |
+|---|---|
+| SERVER_PORT | 8080 |
+
 起動後、ブラウザで以下を開く。
 
 - http://localhost:8080/ — 動作確認用の簡易ページ。リスト・カードの追加/削除がその場でAPI経由で行われ、動いている様子を確認できる
