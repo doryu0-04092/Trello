@@ -5,7 +5,7 @@
 
 ## 構成
 
-- Java 21 + Spring Boot 3.3（Maven）
+- Java 21 + Spring Boot 3.5（Maven）
 - データベース: PostgreSQL（Docker Composeで起動。データはコンテナ再起動後も永続化される）
 - 起動時に初期データとして「作業中」「完了」の2リストを自動作成（要件4.1）
 
