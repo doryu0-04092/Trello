@@ -1,32 +1,28 @@
-# React + TypeScript + Vite
+# フロントエンド雛形
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+要件定義書（`/要件定義書.md`）をもとにした、Trello風タスク管理アプリのフロントエンド最小雛形です（React + TypeScript + Vite）。
+バックエンド（`backend/`）が `http://localhost:8080` で起動している前提で、開発サーバーの `/api` 宛リクエストをそこへプロキシします。
 
-Currently, two official plugins are available:
+## 起動方法
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## ポート
+
+開発サーバー・プレビューともにポートを固定しており、`strictPort: true`（[vite.config.ts](vite.config.ts)）により指定ポートが使用中の場合は別ポートへ自動フォールバックせず起動エラーで終了する。
+
+| コマンド | ポート |
+|---|---|
+| `npm run dev` | 5173 |
+| `npm run preview` | 4173 |
+
+バックエンド（デフォルト `8080`、[backend/README.md](../backend/README.md) 参照）とはポート帯が異なるため競合しない。バックエンドのポートを `SERVER_PORT` で変更した場合は、[vite.config.ts](vite.config.ts) の `server.proxy` の向き先も合わせて変更すること。
+
+## Lint
+
+```bash
+npm run lint
+```
